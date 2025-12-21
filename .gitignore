@@ -1,0 +1,29 @@
+# System
+.DS_Store
+Thumbs.db
+
+# Python / Backend
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.env
+
+# Node / Frontend
+node_modules/
+.next/
+out/
+build/
+.vercel
+*.log
+
+# Project Specific
+collection.xml
+collection_*.xml
+debug_parser.py
