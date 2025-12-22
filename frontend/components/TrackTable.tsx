@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Track } from "../types";
-import { AlertTriangle, XCircle, Search, Filter, Layers } from "lucide-react";
+import { AlertTriangle, XCircle, Search, Filter, Layers, Disc3 } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface TrackTableProps {
@@ -45,23 +45,23 @@ export default function TrackTable({ tracks }: TrackTableProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="bg-slate-900/50 rounded-2xl border border-white/5 backdrop-blur-md overflow-hidden flex flex-col h-[700px] shadow-xl"
+            className="glass-panel rounded-2xl overflow-hidden flex flex-col h-[700px]"
         >
             {/* Header */}
-            <div className="p-6 border-b border-slate-800/50 space-y-4">
+            <div className="p-6 border-b border-white/5 space-y-4 bg-white/5">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h3 className="text-xl font-bold text-white tracking-tight">Library Audit</h3>
                         <p className="text-sm text-slate-400">Found issues and flagged tracks</p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                    <div className="flex flex-wrap gap-3 w-full md:w-auto">
                         <div className="relative flex-1 md:w-64 group">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                             <input
                                 type="text"
                                 placeholder="Search artist or title..."
-                                className="w-full bg-slate-950/50 border border-slate-700/50 rounded-xl py-2 pl-9 pr-4 text-sm text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-medium"
+                                className="w-full bg-[#0f172a]/50 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all font-medium placeholder:text-slate-600"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -70,7 +70,7 @@ export default function TrackTable({ tracks }: TrackTableProps) {
                         <div className="relative">
                             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                             <select
-                                className="bg-slate-950/50 border border-slate-700/50 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
+                                className="bg-[#0f172a]/50 border border-white/10 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer hover:bg-white/5 transition-colors"
                                 value={filter}
                                 onChange={(e) => setFilter(e.target.value)}
                             >
@@ -86,7 +86,7 @@ export default function TrackTable({ tracks }: TrackTableProps) {
                         <div className="relative">
                             <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                             <select
-                                className="bg-slate-950/50 border border-slate-700/50 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500 appearance-none cursor-pointer max-w-[200px]"
+                                className="bg-[#0f172a]/50 border border-white/10 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer max-w-[200px] hover:bg-white/5 transition-colors"
                                 value={playlistFilter}
                                 onChange={(e) => setPlaylistFilter(e.target.value)}
                             >
@@ -101,9 +101,9 @@ export default function TrackTable({ tracks }: TrackTableProps) {
             </div>
 
             {/* Table */}
-            <div className="flex-1 overflow-auto custom-scrollbar">
+            <div className="flex-1 overflow-auto">
                 <table className="w-full text-left border-collapse">
-                    <thead className="bg-slate-950/80 sticky top-0 z-10 backdrop-blur-md">
+                    <thead className="bg-[#020617]/90 sticky top-0 z-10 backdrop-blur-md border-b border-white/5">
                         <tr>
                             <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Track Details</th>
                             <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Format</th>
@@ -112,15 +112,22 @@ export default function TrackTable({ tracks }: TrackTableProps) {
                             <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Bitrate</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/50">
+                    <tbody className="divide-y divide-white/5">
                         {filteredTracks.map((track) => (
-                            <tr key={track.track_id} className="hover:bg-blue-500/5 transition-colors group">
+                            <tr key={track.track_id} className="hover:bg-white/5 transition-colors group">
                                 <td className="p-4 max-w-[300px]">
-                                    <div className="font-semibold text-slate-200 truncate">{track.name}</div>
-                                    <div className="text-sm text-slate-500 truncate">{track.artist}</div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-blue-400 group-hover:bg-blue-500/10 transition-colors">
+                                            <Disc3 className="w-4 h-4" />
+                                        </div>
+                                        <div className="overflow-hidden">
+                                            <div className="font-semibold text-slate-200 truncate group-hover:text-white transition-colors">{track.name}</div>
+                                            <div className="text-sm text-slate-500 truncate">{track.artist}</div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td className="p-4 text-sm text-slate-400">
-                                    <span className="px-2.5 py-1 rounded-md bg-slate-800/50 border border-slate-700/50 text-xs font-medium">
+                                    <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-xs font-medium text-slate-300">
                                         {track.kind.split(' ')[0]}
                                     </span>
                                 </td>
@@ -159,7 +166,10 @@ export default function TrackTable({ tracks }: TrackTableProps) {
                                     </div>
                                 </td>
                                 <td className="p-4 text-sm text-slate-400 text-right font-mono">
-                                    {track.bitrate > 0 ? `${track.bitrate}` : '-'} <span className="text-slate-600 text-xs">kbps</span>
+                                    <span className={track.bitrate < 320 && track.bitrate > 0 ? "text-amber-500" : ""}>
+                                        {track.bitrate > 0 ? `${track.bitrate}` : '-'}
+                                    </span>
+                                    <span className="text-slate-600 text-xs ml-1">kbps</span>
                                 </td>
                             </tr>
                         ))}

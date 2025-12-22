@@ -1,15 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
-  --background: #030712;
-  --foreground: #f3f4f6;
+  --background: #020617;
+  --foreground: #ffffff;
+  --accent-blue: #3b82f6;
+  --accent-purple: #a855f7;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg;
+}
+
+.glass-card {
+  @apply bg-white/5 backdrop-blur-md border border-white/5 shadow-md transition-all duration-300;
+}
+
+.glass-card:hover {
+  @apply bg-white/10 border-white/20 shadow-xl -translate-y-1;
 }
 
 @keyframes spin-slow {
@@ -23,4 +37,22 @@ body {
 
 .animate-spin-slow {
   animation: spin-slow 8s linear infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155; 
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569; 
 }

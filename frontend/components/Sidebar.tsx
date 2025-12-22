@@ -1,46 +1,57 @@
 "use client";
 
 import { LayoutDashboard, Music2, Activity, Settings, Disc3 } from "lucide-react";
+import { useState } from "react";
 
 export default function Sidebar() {
+    const [active, setActive] = useState("Overview");
+
     const navItems = [
-        { icon: LayoutDashboard, label: "Overview", active: true },
-        { icon: Music2, label: "Library", active: false },
-        { icon: Activity, label: "Health", active: false },
-        { icon: Settings, label: "Settings", active: false },
+        { icon: LayoutDashboard, label: "Overview" },
+        { icon: Music2, label: "Library" },
+        { icon: Activity, label: "Health" },
+        { icon: Settings, label: "Settings" },
     ];
 
     return (
-        <div className="hidden lg:flex w-64 flex-col border-r border-slate-800 bg-slate-950/80 backdrop-blur-xl h-screen sticky top-0">
-            <div className="h-20 flex items-center px-8 border-b border-slate-800/50">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 mr-3">
-                    <Disc3 className="text-white w-5 h-5 animate-spin-slow" />
+        <div className="hidden lg:flex w-20 flex-col items-center border-r border-white/5 bg-[#020617] h-screen sticky top-0 z-50">
+            <div className="h-20 flex items-center justify-center w-full border-b border-white/5 bg-[#020617]">
+                <div className="relative group cursor-pointer">
+                    <div className="absolute inset-0 bg-blue-500 rounded-full blur-md opacity-20 group-hover:opacity-40 transition-opacity" />
+                    <Disc3 className="text-white w-6 h-6 animate-spin-slow relative z-10" />
                 </div>
-                <span className="text-lg font-bold text-white tracking-tight">Rekorded</span>
             </div>
 
-            <nav className="flex-1 p-6 space-y-2">
-                {navItems.map((item) => (
-                    <button
-                        key={item.label}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${item.active
-                                ? "bg-blue-600/10 text-blue-400 shadow-inner"
-                                : "text-slate-400 hover:text-white hover:bg-slate-900"
-                            }`}
-                    >
-                        <item.icon className="w-5 h-5" />
-                        {item.label}
-                    </button>
-                ))}
+            <nav className="flex-1 flex flex-col items-center gap-6 mt-8 w-full">
+                {navItems.map((item) => {
+                    const isActive = active === item.label;
+                    return (
+                        <button
+                            key={item.label}
+                            onClick={() => setActive(item.label)}
+                            className="relative group p-3 w-full flex justify-center"
+                            title={item.label}
+                        >
+                            {isActive && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-purple-500 rounded-r-full shadow-[0_0_12px_2px_rgba(168,85,247,0.6)]" />
+                            )}
+
+                            <div className={`p-2 rounded-xl transition-all duration-300 ${isActive
+                                    ? "text-white bg-white/5"
+                                    : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                                }`}>
+                                <item.icon className="w-5 h-5 stroke-[1.5px]" />
+                            </div>
+                        </button>
+                    );
+                })}
             </nav>
 
-            <div className="p-6">
-                <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-xl p-4 border border-blue-500/10">
-                    <h4 className="text-sm font-semibold text-white mb-1">Pro Plan</h4>
-                    <p className="text-xs text-slate-400 mb-3">Unlock advanced metrics</p>
-                    <button className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-colors">
-                        Upgrade
-                    </button>
+            <div className="pb-8">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 p-[1px]">
+                    <div className="w-full h-full rounded-full bg-slate-950 flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">JD</span>
+                    </div>
                 </div>
             </div>
         </div>
