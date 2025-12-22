@@ -13,6 +13,9 @@ export interface Track {
     kind: string;
     bitrate: number;
     sample_rate: number;
+    bpm: number;
+    tonality: string;
+    play_count: number;
     year: string;
     location: string;
     issues: TrackIssue[];
@@ -25,6 +28,9 @@ export interface LibraryStats {
     total_gig_ready: number;
     format_distribution: Record<string, number>;
     issue_distribution: Record<string, number>;
+    bpm_distribution: Record<string, number>;
+    key_distribution: Record<string, number>;
+    genre_distribution: Record<string, number>;
 }
 
 export interface AnalysisResult {

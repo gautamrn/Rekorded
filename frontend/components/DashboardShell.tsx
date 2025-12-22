@@ -7,12 +7,14 @@ import { motion } from "framer-motion";
 interface DashboardShellProps {
     children: ReactNode;
     onUploadNew: () => void;
+    activeTab: "health" | "stats";
+    setActiveTab: (tab: "health" | "stats") => void;
 }
 
-export default function DashboardShell({ children, onUploadNew }: DashboardShellProps) {
+export default function DashboardShell({ children, onUploadNew, activeTab, setActiveTab }: DashboardShellProps) {
     return (
         <div className="bg-[#020617] min-h-screen flex font-sans overflow-hidden selection:bg-purple-500/30">
-            <Sidebar />
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
             {/* Main Content Area */}
             <main className="flex-1 relative flex flex-col h-screen overflow-hidden">
@@ -24,9 +26,11 @@ export default function DashboardShell({ children, onUploadNew }: DashboardShell
 
                 {/* Top Header */}
                 <header className="relative z-10 flex justify-between items-center px-8 py-6 border-b border-white/5 bg-[#020617]/50 backdrop-blur-sm">
-                    <div>
-                        <h1 className="text-2xl font-bold text-white tracking-tight">Overview</h1>
-                        <p className="text-slate-400 text-sm">Welcome back, DJ.</p>
+                    <div className="flex items-center gap-12">
+                        <div>
+                            <h1 className="text-2xl font-bold text-white tracking-tight">USB Health Check</h1>
+                            <p className="text-slate-400 text-sm">Audit your export before you play.</p>
+                        </div>
                     </div>
                     <div className="flex gap-4">
                         <button

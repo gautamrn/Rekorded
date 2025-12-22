@@ -15,6 +15,9 @@ class Track(BaseModel):
     kind: str = "Unknown"
     bitrate: int = 0
     sample_rate: int = 0
+    bpm: float = 0.0
+    tonality: str = "-"
+    play_count: int = 0
     year: str = "-"
     location: str
     issues: List[TrackIssue] = []
@@ -27,6 +30,9 @@ class LibraryStats(BaseModel):
     total_gig_ready: int
     format_distribution: Dict[str, int]
     issue_distribution: Dict[str, int]
+    bpm_distribution: Dict[str, int] = {}
+    key_distribution: Dict[str, int] = {}
+    genre_distribution: Dict[str, int] = {}
 
 class AnalysisResult(BaseModel):
     stats: LibraryStats

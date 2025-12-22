@@ -51,8 +51,8 @@ export default function TrackTable({ tracks }: TrackTableProps) {
             <div className="p-6 border-b border-white/5 space-y-4 bg-white/5">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h3 className="text-xl font-bold text-white tracking-tight">Library Audit</h3>
-                        <p className="text-sm text-slate-400">Found issues and flagged tracks</p>
+                        <h3 className="text-xl font-bold text-white tracking-tight">USB Health Check</h3>
+                        <p className="text-sm text-slate-400">Audit your export before you play</p>
                     </div>
 
                     <div className="flex flex-wrap gap-3 w-full md:w-auto">

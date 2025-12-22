@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Rekorded | Pro Library Audit",
-  description: "Advanced health check for Rekordbox collections.",
+  title: "Rekorded | USB Helper",
+  description: "The ultimate health check for your Rekordbox USB exports.",
 };
 
 export default function RootLayout({

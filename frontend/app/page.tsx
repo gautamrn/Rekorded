@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import UploadZone from "@/components/UploadZone";
-import Charts from "@/components/Charts";
+import { FormatDistributionChart } from "@/components/Charts";
 import TrackTable from "@/components/TrackTable";
 import StatsCards from "@/components/StatsCards";
+import StatsView from "@/components/StatsView";
 import DashboardShell from "@/components/DashboardShell";
 import { AnalysisResult } from "@/types";
 import { Disc3 } from "lucide-react";
 
 export default function Home() {
   const [data, setData] = useState<AnalysisResult | null>(null);
+  const [activeTab, setActiveTab] = useState<"health" | "stats">("health");
 
   // If no data, show Landing / Upload view
   if (!data) {
@@ -43,13 +45,13 @@ export default function Home() {
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl rounded-full pointer-events-none -z-10" />
 
             <h2 className="text-6xl md:text-8xl font-extrabold tracking-tight text-white leading-tight">
-              Your Library, <br />
+              Export with <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-gradient-x">
-                Perfected.
+                Confidence.
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-slate-400 leading-relaxed max-w-2xl mx-auto font-light">
-              The ultimate health check for your Rekordbox collection. Detect low-bitrate files, missing cues, and dynamic tempos instantly.
+              The ultimate USB health check for your Rekordbox collection. Instantly detect low-bitrate, missing cues, and broken links.
             </p>
           </div>
 
@@ -61,15 +63,27 @@ export default function Home() {
 
   // Dashboard View: Wrapped in DashboardShell
   return (
-    <DashboardShell onUploadNew={() => setData(null)}>
-      {/* Section 1: Hero Stats */}
-      <StatsCards stats={data.stats} />
+    <DashboardShell
+      onUploadNew={() => setData(null)}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+    >
+      {activeTab === "health" ? (
+        <>
+          {/* Section 1: Hero Stats */}
+          <StatsCards stats={data.stats} />
 
-      {/* Section 2: Charts */}
-      <Charts stats={data.stats} />
+          {/* Section 2: Format Distribution */}
+          <div className="max-w-md mx-auto">
+            <FormatDistributionChart stats={data.stats} />
+          </div>
 
-      {/* Section 3: Flagged Tracks Table */}
-      <TrackTable tracks={data.tracks || []} />
+          {/* Section 3: Flagged Tracks Table */}
+          <TrackTable tracks={data.tracks || []} />
+        </>
+      ) : (
+        <StatsView stats={data.stats} tracks={data.tracks || []} />
+      )}
     </DashboardShell>
   );
 }

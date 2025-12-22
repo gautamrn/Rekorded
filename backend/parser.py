@@ -57,6 +57,10 @@ def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:
         "Dynamic Tempo": 0
     }
     
+    bpm_dist: Dict[str, int] = {}
+    key_dist: Dict[str, int] = {}
+    genre_dist: Dict[str, int] = {}
+    
     seen_tracks: Dict[Tuple[str, str], List[str]] = {} 
 
     total_ready = 0
@@ -64,20 +68,41 @@ def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:
     for entry in collection.findall("TRACK"):
         attr = entry.attrib
         
+        name = attr.get("Name", "").strip()
+        location = attr.get("Location", "")
+
+        # 1. Ignore if no name
+        if not name:
+            continue
+            
+        # 2. Skip streamed tracks (updated check for file://localhost format)
+        # SoundCloud, Spotify, Tidal, Beatport, etc.
+        streaming_keywords = ["soundcloud", "spotify", "tidal", "beatport"]
+        if any(kw in location.lower() for kw in streaming_keywords):
+            continue
+            
         tid = attr.get("TrackID", "")
-        name = attr.get("Name", "Unknown")
         artist = attr.get("Artist", "Unknown")
+        genre = attr.get("Genre", "Unknown")
         kind = attr.get("Kind", "Unknown File")
+        
         bitrate_str = attr.get("BitRate", "0")
         bitrate = int(bitrate_str) if bitrate_str.isdigit() else 0
-        location = attr.get("Location", "")
+        
+        bpm_str = attr.get("AverageBpm", "0")
+        bpm = float(bpm_str) if bpm_str.replace('.', '', 1).isdigit() else 0.0
+        
+        tonality = attr.get("Tonality", "-")
+        
+        play_count_str = attr.get("PlayCount", "0")
+        play_count = int(play_count_str) if play_count_str.isdigit() else 0
         
         cues = entry.findall("POSITION_MARK")
         has_cues = len(cues) > 0
         
         # Check excessive tempo tags
         tempos = entry.findall("TEMPO")
-        has_dynamic_tempo = len(tempos) > 10 # Arbitrary threshold for "excessive" or just weird
+        has_dynamic_tempo = len(tempos) > 10
         
         current_issues = []
         
@@ -95,7 +120,7 @@ def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:
             issue_counts["Broken Link"] += 1
         
         if has_dynamic_tempo:
-             current_issues.append(TrackIssue(issue_type="Dynamic Tempo", description=f"Track has {len(tempos)} tempo changes. Re-analyze in Normal mode.", severity="warning"))
+             current_issues.append(TrackIssue(issue_type="Dynamic Tempo", description=f"Track has {len(tempos)} tempo changes.", severity="warning"))
              issue_counts["Dynamic Tempo"] += 1
 
         norm_key = (artist.strip().lower(), name.strip().lower())
@@ -106,6 +131,15 @@ def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:
         fmt = kind.split(" ")[0]
         format_counts[fmt] = format_counts.get(fmt, 0) + 1
         
+        # Aggregates for Stats
+        genre_dist[genre] = genre_dist.get(genre, 0) + 1
+        key_dist[tonality] = key_dist.get(tonality, 0) + 1
+        
+        # Simple BPM distribution buckets
+        if bpm > 0:
+            bpm_bucket = f"{int(bpm // 10 * 10)}s"
+            bpm_dist[bpm_bucket] = bpm_dist.get(bpm_bucket, 0) + 1
+
         is_gig_ready = has_cues and (not is_compressed or bitrate >= 256)
         if is_gig_ready:
             total_ready += 1
@@ -114,10 +148,13 @@ def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:
             track_id=tid,
             name=name,
             artist=artist,
-            genre=attr.get("Genre", ""),
+            genre=genre,
             kind=kind,
             bitrate=bitrate,
             sample_rate=int(attr.get("SampleRate", "0")),
+            bpm=bpm,
+            tonality=tonality,
+            play_count=play_count,
             year=attr.get("Year", ""),
             location=location,
             issues=current_issues,
@@ -137,7 +174,6 @@ def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:
                 t.issues.append(TrackIssue(issue_type="Duplicate", description=f"Duplicate track found ({len(ids)} copies)", severity="warning"))
     
     issue_counts["Duplicate"] = duplicates_found
-    
     flagged = [t for t in tracks if len(t.issues) > 0]
     
     return AnalysisResult(
@@ -145,7 +181,10 @@ def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:
             total_tracks=len(tracks),
             total_gig_ready=total_ready,
             format_distribution=format_counts,
-            issue_distribution=issue_counts
+            issue_distribution=issue_counts,
+            bpm_distribution=bpm_dist,
+            key_distribution=key_dist,
+            genre_distribution=genre_dist
         ),
         tracks=tracks,
         flagged_tracks=flagged
