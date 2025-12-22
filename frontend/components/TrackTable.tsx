@@ -7,18 +7,12 @@ import { motion } from "framer-motion";
 
 interface TrackTableProps {
     tracks: Track[];
+    playlistFilter: string;
 }
 
-export default function TrackTable({ tracks }: TrackTableProps) {
+export default function TrackTable({ tracks, playlistFilter }: TrackTableProps) {
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("all");
-    const [playlistFilter, setPlaylistFilter] = useState("all");
-
-    const allPlaylists = useMemo(() => {
-        const s = new Set<string>();
-        tracks.forEach(t => t.playlists.forEach(p => s.add(p)));
-        return Array.from(s).sort();
-    }, [tracks]);
 
     const filteredTracks = useMemo(() => {
         return tracks.filter((track) => {
@@ -32,13 +26,13 @@ export default function TrackTable({ tracks }: TrackTableProps) {
                 if (!track.issues.some(i => i.issue_type === filter)) return false;
             }
 
-            if (playlistFilter !== "all") {
-                if (!track.playlists.includes(playlistFilter)) return false;
-            }
+            // Global playlist filter is already applied to 'tracks' prop in page.tsx
+            // but we keep the logic here for robustness if needed, 
+            // though it's redundant now since the data passed is already filtered.
 
             return true;
         });
-    }, [tracks, search, filter, playlistFilter]);
+    }, [tracks, search, filter]);
 
     return (
         <motion.div
@@ -80,20 +74,6 @@ export default function TrackTable({ tracks }: TrackTableProps) {
                                 <option value="Broken Link">Broken Link</option>
                                 <option value="Duplicate">Duplicate</option>
                                 <option value="Dynamic Tempo">Dynamic Tempo</option>
-                            </select>
-                        </div>
-
-                        <div className="relative">
-                            <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                            <select
-                                className="bg-[#0f172a]/50 border border-white/10 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer max-w-[200px] hover:bg-white/5 transition-colors"
-                                value={playlistFilter}
-                                onChange={(e) => setPlaylistFilter(e.target.value)}
-                            >
-                                <option value="all">All Playlists</option>
-                                {allPlaylists.map(p => (
-                                    <option key={p} value={p}>{p}</option>
-                                ))}
                             </select>
                         </div>
                     </div>

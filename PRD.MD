@@ -40,6 +40,11 @@ Rekorded is a web-based "Library Health Check" tool for DJs. It allows users to 
 | **Data Logic** | Python (ElementTree) | Built-in library to parse XML structures efficiently. |
 | **Charts** | Recharts | Simple, declarative React charts that look professional. |
 
+## 4. Extended Backend Requirements (Auth & DB)
+- **User Management:** Secure sign-up/login via Google OAuth or Clerk.
+- **Relational Schema:** Implementation of a PostgreSQL database to store long-term library trends.
+- **Data Deduplication:** Logic to prevent duplicate track entries when a user uploads multiple XMLs over time.
+- **API Caching:** Store Spotify "Energy" scores in the DB so you don't call the API for the same track twice (saving costs/limits).
 ---
 
 ## 5. Success Metrics for Resume
