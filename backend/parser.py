@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from typing import List, Dict, Tuple
-from .models import Track, TrackIssue, LibraryStats, AnalysisResult
+from models import Track, TrackIssue, LibraryStats, AnalysisResult
 import urllib.parse
 
 def parse_rekordbox_xml(xml_content: bytes) -> AnalysisResult:

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import UploadZone from "@/components/UploadZone";
 import { FormatDistributionChart } from "@/components/Charts";
 import TrackTable from "@/components/TrackTable";
@@ -9,8 +9,10 @@ import StatsView from "@/components/StatsView";
 import DashboardShell from "@/components/DashboardShell";
 import { AnalysisResult, LibraryStats } from "@/types";
 import { Disc3, Layers } from "lucide-react";
+import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 
 export default function Home() {
+  const { getToken } = useAuth();
   const [data, setData] = useState<AnalysisResult | null>(null);
   const [activeTab, setActiveTab] = useState<"health" | "stats">("health");
   const [playlistFilter, setPlaylistFilter] = useState("all");
@@ -84,6 +86,47 @@ export default function Home() {
     };
   }, [data, playlistFilter]);
 
+  const loadLibrary = async (libraryId: number) => {
+    try {
+      const token = await getToken();
+      const res = await fetch(`http://localhost:8000/libraries/${libraryId}`, {
+        headers: token ? { "Authorization": `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const libraryData: AnalysisResult = await res.json();
+        setData(libraryData);
+        setPlaylistFilter("all");
+      }
+    } catch (error) {
+      console.error("Failed to load library:", error);
+    }
+  };
+
+  const loadMostRecentLibrary = async () => {
+    try {
+      const token = await getToken();
+      if (!token) return; // Not logged in
+
+      const res = await fetch("http://localhost:8000/libraries", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const libraries = await res.json();
+        if (libraries.length > 0) {
+          // Load the most recent (first in the list)
+          await loadLibrary(libraries[0].id);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load recent library:", error);
+    }
+  };
+
+  // Auto-load most recent library on mount
+  useEffect(() => {
+    loadMostRecentLibrary();
+  }, []);
+
   // If no data, show Landing / Upload view
   if (!data || !filteredData) {
     return (
@@ -92,10 +135,13 @@ export default function Home() {
         <div className="absolute top-0 left-0 w-full h-[600px] bg-blue-600/10 blur-[150px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-600/10 blur-[150px] rounded-full pointer-events-none" />
 
+
+
         {/* Grid Background */}
         <div className="absolute inset-0 pointer-events-none z-0 opacity-20"
           style={{ backgroundImage: 'radial-gradient(#334155 1px, transparent 1px)', backgroundSize: '32px 32px' }}
         />
+
 
         {/* Header */}
         <header className="w-full px-8 py-8 flex items-center justify-between z-10">
@@ -105,9 +151,24 @@ export default function Home() {
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">Rekorded</h1>
           </div>
-          <button className="px-5 py-2 rounded-full border border-white/10 text-sm font-medium text-slate-300 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all bg-white/5 backdrop-blur-md">
-            GitHub
-          </button>
+          <div className="flex items-center gap-4">
+            <SignedIn>
+              <button
+                onClick={loadMostRecentLibrary}
+                className="px-5 py-2 rounded-full border border-white/10 text-sm font-medium text-slate-300 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all bg-white/5 backdrop-blur-md"
+              >
+                Home
+              </button>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="px-5 py-2 rounded-full border border-white/10 text-sm font-medium text-slate-300 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all bg-white/5 backdrop-blur-md">
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
+          </div>
         </header>
 
         <div className="flex-1 flex flex-col items-center justify-center p-6 z-10 animate-in fade-in zoom-in-95 duration-700">
@@ -137,6 +198,7 @@ export default function Home() {
       onUploadNew={() => { setData(null); setPlaylistFilter("all"); }}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
+      onLibrarySelect={loadLibrary}
     >
       {/* Global Playlist Selector */}
       <div className="flex justify-end mb-4">

@@ -8,7 +8,10 @@ interface UploadZoneProps {
     onAnalysisComplete: (data: AnalysisResult) => void;
 }
 
+import { useAuth } from "@clerk/nextjs";
+
 export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
+    const { getToken, userId } = useAuth();
     const [isDragging, setIsDragging] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -47,10 +50,27 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
         formData.append("file", file);
 
         try {
+            const token = await getToken();
+            const headers: HeadersInit = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
+
+            console.log("Uploading file...", { hasToken: !!token });
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
             const res = await fetch("http://localhost:8000/upload", {
                 method: "POST",
                 body: formData,
+                headers: headers,
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
+
+            console.log("Response received:", res.status);
 
             if (!res.ok) {
                 const errorText = await res.text();
@@ -60,9 +80,13 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
 
             const data: AnalysisResult = await res.json();
             onAnalysisComplete(data);
-        } catch (err) {
-            setError("An error occurred while uploading. Is the backend running?");
-            console.error(err);
+        } catch (err: any) {
+            if (err.name === 'AbortError') {
+                setError("Upload timed out. Please check if the backend is running.");
+            } else {
+                setError("An error occurred while uploading. Is the backend running?");
+            }
+            console.error("Upload error:", err);
         } finally {
             setIsUploading(false);
         }
