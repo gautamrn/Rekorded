@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from parser import parse_rekordbox_xml
+from xml_parser import parse_rekordbox_xml
 from models import AnalysisResult
 from database import engine, get_db
 import models_db
