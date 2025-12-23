@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 
 import { ClerkProvider } from "@clerk/nextjs";
 
+import { Analytics } from "@vercel/analytics/react";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,6 +28,7 @@ export default function RootLayout({
           className={`${inter.variable} antialiased bg-[#020617] text-white`}
         >
           {children}
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
