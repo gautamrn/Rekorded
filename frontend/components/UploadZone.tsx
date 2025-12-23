@@ -162,7 +162,7 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
                                 await uploadFile(file);
                             } catch (err) {
                                 console.error("Demo upload failed:", err);
-                                setError("Failed to load demo collection");
+                                setError(err instanceof Error ? err.message : "Failed to load demo collection");
                             }
                         }}
                         disabled={isUploading}
