@@ -89,7 +89,7 @@ export default function Home() {
   const loadLibrary = async (libraryId: number) => {
     try {
       const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/libraries/${libraryId}`, {
+      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/libraries/${libraryId}`, {
         headers: token ? { "Authorization": `Bearer ${token}` } : {}
       });
       if (res.ok) {
@@ -107,7 +107,7 @@ export default function Home() {
       const token = await getToken();
       if (!token) return; // Not logged in
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/libraries`, {
+      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/libraries`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {

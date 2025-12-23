@@ -33,7 +33,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLibrarySelect }: Si
         setLoading(true);
         try {
             const token = await getToken();
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/libraries`, {
+            const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/libraries`, {
                 headers: token ? { "Authorization": `Bearer ${token}` } : {}
             });
             if (res.ok) {
@@ -53,7 +53,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLibrarySelect }: Si
 
         try {
             const token = await getToken();
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/libraries/${libraryId}`, {
+            const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/libraries/${libraryId}`, {
                 method: "DELETE",
                 headers: token ? { "Authorization": `Bearer ${token}` } : {}
             });
