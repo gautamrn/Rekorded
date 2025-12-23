@@ -61,7 +61,7 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-            const res = await fetch("http://localhost:8000/upload", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/upload`, {
                 method: "POST",
                 body: formData,
                 headers: headers,

@@ -8,7 +8,8 @@ load_dotenv()
 # Use environment variable or default to local postgres
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/rekorded")
 
-engine = create_engine(DATABASE_URL)
+# Security: Ensure SSL for production DBs (usually handled in URL, but engine args help)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

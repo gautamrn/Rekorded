@@ -33,7 +33,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLibrarySelect }: Si
         setLoading(true);
         try {
             const token = await getToken();
-            const res = await fetch("http://localhost:8000/libraries", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/libraries`, {
                 headers: token ? { "Authorization": `Bearer ${token}` } : {}
             });
             if (res.ok) {
@@ -53,7 +53,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLibrarySelect }: Si
 
         try {
             const token = await getToken();
-            const res = await fetch(`http://localhost:8000/libraries/${libraryId}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/libraries/${libraryId}`, {
                 method: "DELETE",
                 headers: token ? { "Authorization": `Bearer ${token}` } : {}
             });
@@ -111,8 +111,8 @@ export default function Sidebar({ activeTab, setActiveTab, onLibrarySelect }: Si
                             key={item.id}
                             onClick={() => setActiveTab(item.id as any)}
                             className={`relative group p-3 rounded-lg flex items-center gap-3 transition-all ${isActive
-                                    ? "text-white bg-white/10"
-                                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                                ? "text-white bg-white/10"
+                                : "text-slate-400 hover:text-white hover:bg-white/5"
                                 } ${isCollapsed ? "justify-center" : ""}`}
                             title={isCollapsed ? item.label : undefined}
                         >
