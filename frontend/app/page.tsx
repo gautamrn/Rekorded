@@ -184,6 +184,17 @@ export default function Home() {
             <p className="text-xl md:text-2xl text-slate-400 leading-relaxed max-w-2xl mx-auto font-light">
               The ultimate USB health check for your Rekordbox collection. Instantly detect low-bitrate, missing cues, and broken links.
             </p>
+
+            <div className="flex justify-center pt-4">
+              <a
+                href="/demo_collection.xml"
+                download
+                className="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-white/10 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all bg-white/5 backdrop-blur-md"
+              >
+                <code className="text-xs bg-white/10 px-1.5 py-0.5 rounded">demo_collection.xml</code>
+                <span>Download Sample</span>
+              </a>
+            </div>
           </div>
 
           <UploadZone onAnalysisComplete={setData} />
