@@ -80,8 +80,8 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
 
             const data: AnalysisResult = await res.json();
             onAnalysisComplete(data);
-        } catch (err: any) {
-            if (err.name === 'AbortError') {
+        } catch (err) {
+            if (err instanceof Error && err.name === 'AbortError') {
                 setError("Upload timed out. Please check if the backend is running.");
             } else {
                 setError("An error occurred while uploading. Is the backend running?");

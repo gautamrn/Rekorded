@@ -65,7 +65,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLibrarySelect }: Si
         }
     };
 
-    const navItems = [
+    const navItems: Array<{ id: "health" | "stats"; icon: typeof Activity; label: string }> = [
         { id: "health", icon: Activity, label: "Health" },
         { id: "stats", icon: BarChart2, label: "Insights" },
     ];
@@ -109,7 +109,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLibrarySelect }: Si
                     return (
                         <button
                             key={item.id}
-                            onClick={() => setActiveTab(item.id as any)}
+                            onClick={() => setActiveTab(item.id)}
                             className={`relative group p-3 rounded-lg flex items-center gap-3 transition-all ${isActive
                                 ? "text-white bg-white/10"
                                 : "text-slate-400 hover:text-white hover:bg-white/5"
