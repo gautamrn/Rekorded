@@ -17,10 +17,9 @@ Rekorded is a modern web application designed for DJs to instantly audit their m
 
 Want to see it in action without exporting your entire library?
 
-1.  Download the sample file: [**demo_collection.xml**](./demo_collection.xml)
-2.  Go to [Rekorded](https://rekorded.vercel.app).
-3.  Drag and drop the file into the upload zone.
-4.  Explore the insights!
+1.  Go to [Rekorded](https://rekorded.vercel.app).
+2.  Click **"Try with Demo Collection"** in the upload area.
+3.  Explore the insights instantly!
 
 ## 🛠️ Tech Stack
 

@@ -148,6 +148,29 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
                 >
                     {isUploading ? "Processing..." : "Select File"}
                 </label>
+
+                <div className="flex items-center gap-3">
+                    <span className="text-gray-500 text-sm">or</span>
+                    <button
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            try {
+                                const response = await fetch("/demo_collection.xml");
+                                if (!response.ok) throw new Error("Failed to fetch demo file");
+                                const blob = await response.blob();
+                                const file = new File([blob], "demo_collection.xml", { type: "text/xml" });
+                                await uploadFile(file);
+                            } catch (err) {
+                                console.error("Demo upload failed:", err);
+                                setError("Failed to load demo collection");
+                            }
+                        }}
+                        disabled={isUploading}
+                        className="text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-4 py-2 rounded-full border border-blue-400/20 hover:bg-blue-400/20"
+                    >
+                        Try with Demo Collection
+                    </button>
+                </div>
             </div>
         </div>
     );
