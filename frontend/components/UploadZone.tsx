@@ -3,15 +3,14 @@
 import { useState, useCallback } from "react";
 import { Upload, AlertCircle } from "lucide-react";
 import { AnalysisResult } from "../types";
+import { useAuth } from "@clerk/nextjs";
 
 interface UploadZoneProps {
     onAnalysisComplete: (data: AnalysisResult) => void;
 }
 
-import { useAuth } from "@clerk/nextjs";
-
 export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
-    const { getToken, userId } = useAuth();
+    const { getToken } = useAuth();
     const [isDragging, setIsDragging] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -56,10 +55,8 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
                 headers["Authorization"] = `Bearer ${token}`;
             }
 
-            console.log("Uploading file...", { hasToken: !!token });
-
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
 
             const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/upload`, {
                 method: "POST",
@@ -69,8 +66,6 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
             });
 
             clearTimeout(timeoutId);
-
-            console.log("Response received:", res.status);
 
             if (!res.ok) {
                 const errorText = await res.text();
@@ -93,83 +88,86 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
     };
 
     return (
-        <div
-            className={`relative w-full max-w-2xl mx-auto min-h-[400px] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center transition-all duration-300 ${isDragging
-                ? "border-blue-500 bg-blue-50/10 scale-[1.02]"
-                : "border-gray-700 hover:border-gray-500 bg-gray-900/50"
+        <div className="w-full max-w-lg mx-auto">
+            <div
+                className={`relative rounded-xl border border-dashed p-10 flex flex-col items-center justify-center transition-colors ${
+                    isDragging
+                        ? "border-blue-500/60 bg-blue-500/[0.04]"
+                        : "border-zinc-700/60 hover:border-zinc-600"
                 }`}
-            onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-            }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-        >
-            <input
-                type="file"
-                id="file-upload"
-                accept=".xml"
-                className="hidden"
-                onChange={handleFileSelect}
-                disabled={isUploading}
-            />
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+            >
+                <input
+                    type="file"
+                    id="file-upload"
+                    accept=".xml"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                    disabled={isUploading}
+                />
 
-            <div className="flex flex-col items-center gap-6 p-10 text-center">
-                <div className="p-6 bg-gray-800 rounded-full shadow-2xl shadow-blue-500/10">
-                    {isUploading ? (
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-                    ) : (
-                        <Upload className="w-12 h-12 text-blue-400" />
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-white tracking-tight">
-                        {isUploading ? "Analyzing Library..." : "Upload collection.xml"}
-                    </h2>
-                    <p className="text-gray-400 max-w-sm">
-                        Drag and drop your Rekordbox collection file here, or click to browse.
-                    </p>
-                </div>
-
-                {error && (
-                    <div className="flex items-center gap-2 text-red-400 bg-red-900/20 px-4 py-2 rounded-lg">
-                        <AlertCircle className="w-4 h-4" />
-                        <span className="text-sm">{error}</span>
+                <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="p-3 rounded-lg bg-[var(--surface-2)]">
+                        {isUploading ? (
+                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-600 border-t-blue-500" />
+                        ) : (
+                            <Upload className="w-6 h-6 text-zinc-500" />
+                        )}
                     </div>
-                )}
 
-                <label
-                    htmlFor="file-upload"
-                    className={`cursor-pointer px-8 py-3 rounded-full text-sm font-medium transition-all ${isUploading
-                        ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30"
-                        }`}
-                >
-                    {isUploading ? "Processing..." : "Select File"}
-                </label>
+                    <div className="space-y-1.5">
+                        <p className="text-sm font-medium text-zinc-300">
+                            {isUploading ? "Analyzing..." : "Drop collection.xml here"}
+                        </p>
+                        <p className="text-xs text-zinc-600">
+                            or click below to browse
+                        </p>
+                    </div>
 
-                <div className="flex items-center gap-3">
-                    <span className="text-gray-500 text-sm">or</span>
-                    <button
-                        onClick={async (e) => {
-                            e.preventDefault();
-                            try {
-                                const response = await fetch("/demo_collection.xml");
-                                if (!response.ok) throw new Error("Failed to fetch demo file");
-                                const blob = await response.blob();
-                                const file = new File([blob], "demo_collection.xml", { type: "text/xml" });
-                                await uploadFile(file);
-                            } catch (err) {
-                                console.error("Demo upload failed:", err);
-                                setError(err instanceof Error ? err.message : "Failed to load demo collection");
-                            }
-                        }}
-                        disabled={isUploading}
-                        className="text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-4 py-2 rounded-full border border-blue-400/20 hover:bg-blue-400/20"
-                    >
-                        Try with Demo Collection
-                    </button>
+                    {error && (
+                        <div className="flex items-center gap-2 text-red-400 text-xs bg-red-500/[0.06] px-3 py-1.5 rounded-md">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                            <span>{error}</span>
+                        </div>
+                    )}
+
+                    <div className="flex items-center gap-3">
+                        <label
+                            htmlFor="file-upload"
+                            className={`cursor-pointer px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                isUploading
+                                    ? "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-500 text-white"
+                            }`}
+                        >
+                            {isUploading ? "Processing..." : "Select file"}
+                        </label>
+
+                        <button
+                            onClick={async (e) => {
+                                e.preventDefault();
+                                try {
+                                    const response = await fetch("/demo_collection.xml");
+                                    if (!response.ok) throw new Error("Failed to fetch demo file");
+                                    const blob = await response.blob();
+                                    const file = new File([blob], "demo_collection.xml", { type: "text/xml" });
+                                    await uploadFile(file);
+                                } catch (err) {
+                                    console.error("Demo upload failed:", err);
+                                    setError(err instanceof Error ? err.message : "Failed to load demo collection");
+                                }
+                            }}
+                            disabled={isUploading}
+                            className="px-4 py-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+                        >
+                            Try demo
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

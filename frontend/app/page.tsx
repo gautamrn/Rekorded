@@ -17,7 +17,6 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"health" | "stats">("health");
   const [playlistFilter, setPlaylistFilter] = useState("all");
 
-  // Get all unique playlists across all tracks
   const allPlaylists = useMemo(() => {
     if (!data || !data.tracks) return [];
     const s = new Set<string>();
@@ -25,14 +24,12 @@ export default function Home() {
     return Array.from(s).sort();
   }, [data]);
 
-  // Derive filtered data based on playlist selection
   const filteredData = useMemo(() => {
     if (!data || !data.tracks) return null;
     if (playlistFilter === "all") return data;
 
     const filteredTracks = data.tracks.filter(t => t.playlists.includes(playlistFilter));
 
-    // Recalculate stats for the filtered set
     const formatCounts: Record<string, number> = {};
     const issueCounts: Record<string, number> = {
       "Low Bitrate": 0, "Missing Cues": 0, "Broken Link": 0, "Duplicate": 0, "Dynamic Tempo": 0
@@ -43,23 +40,19 @@ export default function Home() {
     let totalReady = 0;
 
     filteredTracks.forEach(t => {
-      // Formats
       const fmt = t.kind.split(" ")[0];
       formatCounts[fmt] = (formatCounts[fmt] || 0) + 1;
 
-      // Issues
       t.issues.forEach(issue => {
         if (issueCounts.hasOwnProperty(issue.issue_type)) {
           issueCounts[issue.issue_type]++;
         }
       });
 
-      // Readiness
       const isCompressed = t.kind.toUpperCase().includes("MP3") || t.kind.toUpperCase().includes("AAC");
       const isReady = t.has_cues && (!isCompressed || t.bitrate >= 256);
       if (isReady) totalReady++;
 
-      // Stats
       genreDist[t.genre] = (genreDist[t.genre] || 0) + 1;
       keyDist[t.tonality] = (keyDist[t.tonality] || 0) + 1;
       if (t.bpm > 0) {
@@ -105,7 +98,7 @@ export default function Home() {
   const loadMostRecentLibrary = async () => {
     try {
       const token = await getToken();
-      if (!token) return; // Not logged in
+      if (!token) return;
 
       const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/libraries`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -113,7 +106,6 @@ export default function Home() {
       if (res.ok) {
         const libraries = await res.json();
         if (libraries.length > 0) {
-          // Load the most recent (first in the list)
           await loadLibrary(libraries[0].id);
         }
       }
@@ -122,70 +114,50 @@ export default function Home() {
     }
   };
 
-  // Auto-load most recent library on mount
   useEffect(() => {
     loadMostRecentLibrary();
   }, []);
 
-  // If no data, show Landing / Upload view
   if (!data || !filteredData) {
     return (
-      <main className="min-h-screen bg-[#020617] text-slate-200 selection:bg-purple-500/30 flex flex-col relative overflow-hidden font-sans">
-        {/* Background Gradients */}
-        <div className="absolute top-0 left-0 w-full h-[600px] bg-blue-600/10 blur-[150px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-600/10 blur-[150px] rounded-full pointer-events-none" />
-
-
-
-        {/* Grid Background */}
-        <div className="absolute inset-0 pointer-events-none z-0 opacity-20"
-          style={{ backgroundImage: 'radial-gradient(#334155 1px, transparent 1px)', backgroundSize: '32px 32px' }}
-        />
-
+      <main className="min-h-screen bg-[var(--background)] text-zinc-200 flex flex-col relative overflow-hidden font-sans">
+        {/* Subtle top glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/[0.04] blur-[120px] rounded-full pointer-events-none" />
 
         {/* Header */}
-        <header className="w-full px-8 py-8 flex items-center justify-between z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20 ring-1 ring-white/10">
-              <Disc3 className="text-white w-6 h-6 animate-spin-slow" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Rekorded</h1>
+        <header className="w-full px-8 py-6 flex items-center justify-between z-10">
+          <div className="flex items-center gap-2.5">
+            <Disc3 className="text-blue-500 w-5 h-5 animate-spin-slow" />
+            <span className="text-lg font-semibold text-white tracking-tight">Rekorded</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <SignedIn>
               <button
                 onClick={loadMostRecentLibrary}
-                className="px-5 py-2 rounded-full border border-white/10 text-sm font-medium text-slate-300 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all bg-white/5 backdrop-blur-md"
+                className="px-4 py-1.5 text-sm text-zinc-400 hover:text-white transition-colors"
               >
-                Home
+                Dashboard
               </button>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="px-5 py-2 rounded-full border border-white/10 text-sm font-medium text-slate-300 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all bg-white/5 backdrop-blur-md">
-                  Sign In
+                <button className="px-4 py-1.5 text-sm text-zinc-400 hover:text-white transition-colors">
+                  Sign in
                 </button>
               </SignInButton>
             </SignedOut>
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center p-6 z-10 animate-in fade-in zoom-in-95 duration-700">
-          <div className="text-center space-y-6 max-w-4xl mb-16 relative">
-            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl rounded-full pointer-events-none -z-10" />
-
-            <h2 className="text-6xl md:text-8xl font-extrabold tracking-tight text-white leading-tight">
-              Export with <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-gradient-x">
-                Confidence.
-              </span>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 pb-20 z-10">
+          <div className="text-center space-y-4 max-w-xl mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-[1.1]">
+              Audit your Rekordbox library
             </h2>
-            <p className="text-xl md:text-2xl text-slate-400 leading-relaxed max-w-2xl mx-auto font-light">
-              The ultimate USB health check for your Rekordbox collection. Instantly detect low-bitrate, missing cues, and broken links.
+            <p className="text-base text-zinc-500 leading-relaxed max-w-md mx-auto">
+              Drop your collection.xml to detect low-bitrate files, missing cues, broken links, and duplicates before your next gig.
             </p>
-
-
           </div>
 
           <UploadZone onAnalysisComplete={setData} />
@@ -194,7 +166,6 @@ export default function Home() {
     );
   }
 
-  // Dashboard View: Wrapped in DashboardShell
   return (
     <DashboardShell
       onUploadNew={() => { setData(null); setPlaylistFilter("all"); }}
@@ -202,12 +173,12 @@ export default function Home() {
       setActiveTab={setActiveTab}
       onLibrarySelect={loadLibrary}
     >
-      {/* Global Playlist Selector */}
-      <div className="flex justify-end mb-4">
+      {/* Playlist Selector */}
+      <div className="flex justify-end mb-6">
         <div className="relative">
-          <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
           <select
-            className="bg-[#0f172a]/50 border border-white/10 rounded-xl pl-9 pr-8 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer hover:bg-white/5 transition-colors"
+            className="bg-[var(--surface)] border border-[var(--border)] rounded-lg pl-8 pr-8 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-500/40 appearance-none cursor-pointer hover:border-[var(--border-hover)] transition-colors"
             value={playlistFilter}
             onChange={(e) => setPlaylistFilter(e.target.value)}
           >
@@ -221,8 +192,7 @@ export default function Home() {
 
       {activeTab === "health" ? (
         <>
-          {/* Hero Section Reorganized: Stats left, Chart right */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <StatsCards stats={filteredData.stats} />
             </div>
@@ -231,7 +201,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Table synced with global selection */}
           <TrackTable tracks={filteredData.tracks || []} playlistFilter={playlistFilter} />
         </>
       ) : (
@@ -240,4 +209,3 @@ export default function Home() {
     </DashboardShell>
   );
 }
-

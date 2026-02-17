@@ -25,7 +25,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className="dark">
         <body
-          className={`${inter.variable} antialiased bg-[#020617] text-white`}
+          className={`${inter.variable} antialiased bg-[#0a0a0f] text-white`}
         >
           {children}
           <Analytics />
