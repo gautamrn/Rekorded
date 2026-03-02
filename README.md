@@ -1,4 +1,4 @@
-# Rekorded 💽
+# Rekorded
 
 > **The ultimate health check for your Rekordbox USB exports.**
 
@@ -6,14 +6,14 @@ Rekorded is a modern web application designed for DJs to instantly audit their m
 
 ![Rekorded Dashboard](image.png)
 
-## 🚀 Features
+## Features
 
 -   **Instant Health Audit**: Automatically flag tracks with low bitrates (< 320kbps), missing hot cues, or broken file paths.
 -   **Library Visualizations**: Interactive charts showing your library's format distribution (MP3 vs AIFF vs WAV), genre breakdown, and key analysis.
 -   **Gig-Readiness Score**: Get a "Gig Ready" percentage to know how prepared your USB really is.
 -   **Secure & Private**: Your library data is processed securely. We only store metadata to show your history; your actual music files never leave your drive.
 
-## ⚡ Quick Start (Demo)
+## Quick Start (Demo)
 
 Want to see it in action without exporting your entire library?
 
@@ -21,13 +21,13 @@ Want to see it in action without exporting your entire library?
 2.  Click **"Try with Demo Collection"** in the upload area.
 3.  Explore the insights instantly!
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 -   **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS 4, Framer Motion, Recharts.
 -   **Backend**: Python (FastAPI), SQLAlchemy, Supabase (PostgreSQL).
 -   **Authentication**: Clerk.
 -   **Deployment**: Vercel (Frontend + Serverless Backend).
 
-## 📄 License
+## License
 
 MIT © [Gautam](https://github.com/gautamrn)
